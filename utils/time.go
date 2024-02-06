@@ -7,29 +7,23 @@ package utils
 import "time"
 
 const (
-	UTCFormat string = "2006-01-02T15:04:05Z"
+	DateFormat     string = "2006-01-02"
+	DateTimeFormat string = "2006-01-02 15:04:05"
+	UTCFormat      string = "2006-01-02T15:04:05Z"
 )
 
-// LocalUTC 获取UTC格式的本地时间
-func LocalUTC(t time.Time) (string, error) {
-	local, err := time.LoadLocation("Local")
-	if err != nil {
-		return "", err
-	}
-	return t.In(local).Format(UTCFormat), nil
+// FormatTime 根据Time获取给定格式的本地格式化时间
+func FormatTime(t time.Time, dateFormat string) string {
+	return t.In(time.Local).Format(dateFormat)
 }
 
-// TimestampToUTC 解析时间戳，获取UTC格式的本地时间
-func TimestampToUTC(timestamp int64) (string, error) {
-	t := time.Unix(timestamp, 0)
-	local, err := time.LoadLocation("Local")
-	if err != nil {
-		return "", err
-	}
-	return t.In(local).Format(UTCFormat), nil
+// FormatTimestamp 根据毫秒级时间戳获取按给定格式的本地格式化时间
+func FormatTimestamp(timestamp int64, dateFormat string) string {
+	t := time.UnixMilli(timestamp)
+	return t.In(time.Local).Format(dateFormat)
 }
 
-// ParseUTC 解析UTC日期
-func ParseUTC(datetime string) (time.Time, error) {
-	return time.ParseInLocation(UTCFormat, datetime, time.Local)
+// ParseFormattedTime 按给定格式解析本地格式化时间
+func ParseFormattedTime(datetime string, dateFormat string) (time.Time, error) {
+	return time.ParseInLocation(dateFormat, datetime, time.Local)
 }
