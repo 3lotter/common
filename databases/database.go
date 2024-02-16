@@ -8,6 +8,7 @@ import (
 	dm "codeup.aliyun.com/6308f33e9011ed4f984a7e9d/dm-gorm2-dialect"
 	"database/sql"
 	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
 
 	"errors"
 	"fmt"
@@ -25,6 +26,7 @@ type Conf struct {
 	MaxOpenConn     int
 	ConnMaxLifeTime int
 	LogMode         logger.LogLevel
+	IsSingularTable bool
 }
 
 type MyGormDB struct {
@@ -41,6 +43,9 @@ func SetupDB(conf Conf) (*MyGormDB, error) {
 
 	gormConf := &gorm.Config{
 		Logger: logger.Default.LogMode(conf.LogMode),
+		NamingStrategy: schema.NamingStrategy{
+			SingularTable: conf.IsSingularTable,
+		},
 	}
 
 	switch dbms {
