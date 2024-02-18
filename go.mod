@@ -16,6 +16,7 @@ require (
 require (
 	codeup.aliyun.com/6308f33e9011ed4f984a7e9d/dm-gorm2-dialect v1.0.0
 	github.com/golang-jwt/jwt/v5 v5.2.0
+	github.com/tjfoc/gmsm/v2 v2.0.0
 )
 
 require (

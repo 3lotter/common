@@ -7,14 +7,22 @@ package utils
 import (
 	"crypto/md5"
 	"crypto/sha256"
+	"github.com/tjfoc/gmsm/v2/sm3"
 	"golang.org/x/crypto/ripemd160"
 	"math/big"
 )
 
+func SM3(input []byte) ([]byte, error) {
+	hasher := sm3.New()
+	if _, err := hasher.Write(input); err != nil {
+		return nil, err
+	}
+	return hasher.Sum(nil), nil
+}
+
 func MD5(input []byte) ([]byte, error) {
 	hasher := md5.New()
-	_, err := hasher.Write(input)
-	if err != nil {
+	if _, err := hasher.Write(input); err != nil {
 		return nil, err
 	}
 	return hasher.Sum(nil), nil
@@ -22,8 +30,8 @@ func MD5(input []byte) ([]byte, error) {
 
 func RIPEMD160(input []byte) ([]byte, error) {
 	hasher := ripemd160.New()
-	_, err := hasher.Write(input)
-	if err != nil {
+	if _, err := hasher.Write(input); err != nil {
+
 		return nil, err
 	}
 	return hasher.Sum(nil), nil
@@ -31,8 +39,7 @@ func RIPEMD160(input []byte) ([]byte, error) {
 
 func SHA256(input []byte) ([]byte, error) {
 	hasher := sha256.New()
-	_, err := hasher.Write(input)
-	if err != nil {
+	if _, err := hasher.Write(input); err != nil {
 		return nil, err
 	}
 	return hasher.Sum(nil), nil
