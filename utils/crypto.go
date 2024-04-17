@@ -7,7 +7,8 @@ package utils
 import (
 	"crypto/md5"
 	"crypto/sha256"
-	"github.com/tjfoc/gmsm/v2/sm3"
+	"github.com/tjfoc/gmsm/sm3"
+	"github.com/tjfoc/gmsm/x509"
 	"golang.org/x/crypto/ripemd160"
 	"math/big"
 )
@@ -59,4 +60,12 @@ func Base58Encode(input []byte) []byte {
 
 	Reverse[byte](res)
 	return res
+}
+
+func SM2Verify(raw, signature, pubKeyBytes []byte) bool {
+	publicKey, err := x509.ParseSm2PublicKey(pubKeyBytes)
+	if err != nil {
+		return false
+	}
+	return publicKey.Verify(raw, signature)
 }
