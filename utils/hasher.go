@@ -1,6 +1,6 @@
 // Package utils
 //
-//	@Title			crypto.go
+//	@Title			hasher.go
 //	@Description	本文件为密码学相关的方法
 package utils
 
@@ -8,9 +8,7 @@ import (
 	"crypto/md5"
 	"crypto/sha256"
 	"github.com/tjfoc/gmsm/sm3"
-	"github.com/tjfoc/gmsm/x509"
 	"golang.org/x/crypto/ripemd160"
-	"math/big"
 )
 
 func SM3(input []byte) ([]byte, error) {
@@ -44,28 +42,4 @@ func SHA256(input []byte) ([]byte, error) {
 		return nil, err
 	}
 	return hasher.Sum(nil), nil
-}
-
-func Base58Encode(input []byte) []byte {
-	var base58Alphabets = []byte("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
-	x := big.NewInt(0).SetBytes(input)
-	zero := big.NewInt(0)
-	base, mod := big.NewInt(58), big.NewInt(0)
-
-	var res []byte
-	for x.Cmp(zero) > 0 {
-		x.DivMod(x, base, mod)
-		res = append(res, base58Alphabets[mod.Int64()])
-	}
-
-	Reverse[byte](res)
-	return res
-}
-
-func SM2Verify(raw, signature, pubKeyBytes []byte) bool {
-	publicKey, err := x509.ParseSm2PublicKey(pubKeyBytes)
-	if err != nil {
-		return false
-	}
-	return publicKey.Verify(raw, signature)
 }
