@@ -5,8 +5,8 @@
 package databases
 
 import (
-	dm "codeup.aliyun.com/6308f33e9011ed4f984a7e9d/dm-gorm2-dialect"
 	"database/sql"
+	dm "github.com/3lotter/dm-gorm2-dialect"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 

@@ -1,8 +1,8 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
-codeup.aliyun.com/6308f33e9011ed4f984a7e9d/dm-driver-go v1.0.0 h1:JqKrq7JPnlztDToWK1veri8Q8d4n0QU4FgZ1TLQO1o4=
-codeup.aliyun.com/6308f33e9011ed4f984a7e9d/dm-driver-go v1.0.0/go.mod h1:lWy9wrf3LtgZqC1j8H++jcFJSEb7zRHLGPffku3+tYY=
-codeup.aliyun.com/6308f33e9011ed4f984a7e9d/dm-gorm2-dialect v1.0.0 h1:Gu3lX/pwaQG8aiujW11Ac9qvyXPIDF8pryLX1Kw2M9Q=
-codeup.aliyun.com/6308f33e9011ed4f984a7e9d/dm-gorm2-dialect v1.0.0/go.mod h1:9vVGjLmz2bPUjI5f4yvoSuYCyqEv9kfv4Om7wUuhfuI=
+github.com/3lotter/dm-driver-go v1.0.0 h1:jwISc8e25l/OEJOarFVLzlQRGwYYOgNpxwQJYi2vgzE=
+github.com/3lotter/dm-driver-go v1.0.0/go.mod h1:nHTItK3QsWw6b6m1FJpevLeFFWV6h/BJtvtHlc2uXTw=
+github.com/3lotter/dm-gorm2-dialect v1.0.0 h1:wgfrmH5JF4YX1Ejz6QbhvjxODqf+civn+xxpCkwFTcs=
+github.com/3lotter/dm-gorm2-dialect v1.0.0/go.mod h1:vg3LBeuRthxTQVjyyUCd/pedL/kjpTbPt0x4OACOlRA=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/cespare/xxhash/v2 v2.1.2 h1:YRXhKfTDauu4ajMg1TPgFO5jnlC2HCbmLXMcTG5cbYE=
