@@ -6,8 +6,6 @@ package databases
 
 import (
 	"database/sql"
-	dm "github.com/3lotter/dm-gorm2-dialect"
-	xugu "github.com/3lotter/xugu-gorm2-dialect"
 	"github.com/pkg/errors"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm/logger"
@@ -22,23 +20,17 @@ import (
 const (
 	mysqlDBMS      string = "mysql"
 	postgresqlDBMS string = "pgsql"
-	dmsqlDBMS      string = "dmsql"
-	xugusqlDBMS    string = "xugusql"
 )
 
 // 各数据库连接语句默认模板
 const (
 	mysqlDsnFormat      string = "%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local%s"
 	postgresqlDsnFormat string = "postgres://%s:%s@%s:%d/%s?sslmode=disable%s"
-	dmsqlDsnFormat      string = "dm://%s:%s@%s:%d?schema=%s%s"
-	xugusqlDsnFormat    string = "User=%s;PWD=%s;IP=%s;Port=%d;DB=%s;CURRENT_SCHEMA=%s;AUTO_COMMIT=on;CHAR_SET=UTF8%s"
 )
 
 var DsnMap = map[string]string{
 	mysqlDBMS:      mysqlDsnFormat,
 	postgresqlDBMS: postgresqlDsnFormat,
-	dmsqlDBMS:      dmsqlDsnFormat,
-	xugusqlDBMS:    xugusqlDsnFormat,
 }
 
 type Conf struct {
@@ -64,10 +56,8 @@ func (conf Conf) GenerateDSN() (string, error) {
 	switch conf.DBMS {
 	case mysqlDBMS:
 		return fmt.Sprintf(dsnFormat, conf.Username, conf.Password, conf.IP, conf.Port, conf.DBName, conf.External), nil
-	case postgresqlDBMS, dmsqlDBMS:
+	case postgresqlDBMS:
 		return fmt.Sprintf(dsnFormat, conf.Username, conf.Password, conf.IP, conf.Port, conf.Schema, conf.External), nil
-	case xugusqlDBMS:
-		return fmt.Sprintf(dsnFormat, conf.Username, conf.Password, conf.IP, conf.Port, conf.DBName, conf.Schema, conf.External), nil
 	}
 	return "", fmt.Errorf("DBMS [%s] not supported", conf.DBMS)
 }
@@ -104,10 +94,6 @@ func SetupDB(conf Conf) (*MyGormDB, error) {
 		gormDB, err = gorm.Open(mysql.Open(conf.DSN), gormConf)
 	case postgresqlDBMS:
 		gormDB, err = gorm.Open(postgres.Open(conf.DSN), gormConf)
-	case dmsqlDBMS:
-		gormDB, err = gorm.Open(dm.Open(conf.DSN), gormConf)
-	case xugusqlDBMS:
-		gormDB, err = gorm.Open(xugu.Open(conf.DSN), gormConf)
 	default:
 		return nil, errors.New(fmt.Sprintf("DBMS [%s] not supported", dbms))
 	}
