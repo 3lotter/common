@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"crypto/x509/pkix"
+	"encoding/asn1"
+	"github.com/tjfoc/gmsm/x509"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,17 +25,93 @@ func TestParseX509Certificate(t *testing.T) {
 }
 
 func TestGetExtensionValue(t *testing.T) {
-	cert, _ := ParseX509Certificate(certPEM)
-
-	t.Run("ValidExtension", func(t *testing.T) {
-		// 假设我们知道证书中有一个扩展，其ID为"2.5.29.14"（subjectKeyIdentifier）
-		extValue, err := GetExtensionValue("2.5.29.14", *cert)
-		assert.NoError(t, err)
-		assert.NotNil(t, extValue)
+	// 正面测试用例：有效的扩展ID和值
+	t.Run("有效扩展", func(t *testing.T) {
+		extID := "1.2.3.4"
+		extValue := []byte{0x30, 0x03, 0x01, 0x02, 0x03}
+		cert := x509.Certificate{
+			Extensions: []pkix.Extension{
+				{Id: asn1.ObjectIdentifier{1, 2, 3, 4}, Value: extValue},
+			},
+		}
+		expected := extValue[2:]
+		result, err := GetExtensionValue(extID, cert)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !isEqual(result, expected) {
+			t.Fatalf("expected %v, got %v", expected, result)
+		}
 	})
 
-	t.Run("InvalidExtension", func(t *testing.T) {
-		_, err := GetExtensionValue("invalid-id", *cert)
-		assert.Error(t, err)
+	// 负面测试用例：扩展ID未找到
+	t.Run("扩展未找到", func(t *testing.T) {
+		extID := "1.2.3.5"
+		cert := x509.Certificate{
+			Extensions: []pkix.Extension{
+				{Id: asn1.ObjectIdentifier{1, 2, 3, 4}, Value: []byte{0x30, 0x03, 0x01, 0x02, 0x03}},
+			},
+		}
+		_, err := GetExtensionValue(extID, cert)
+		if err != errCertExtensionNotFound {
+			t.Fatalf("expected error %v, got %v", errCertExtensionNotFound, err)
+		}
 	})
+
+	// 负面测试用例：扩展值不是ASN.1编码
+	t.Run("扩展值不是ASN.1编码", func(t *testing.T) {
+		extID := "1.2.3.4"
+		cert := x509.Certificate{
+			Extensions: []pkix.Extension{
+				{Id: asn1.ObjectIdentifier{1, 2, 3, 4}, Value: []byte{0x01}},
+			},
+		}
+		_, err := GetExtensionValue(extID, cert)
+		if err != errCertExtensionNotASN1Encoded {
+			t.Fatalf("expected error %v, got %v", errCertExtensionNotASN1Encoded, err)
+		}
+	})
+
+	// 边界情况：证书扩展为空
+	t.Run("证书扩展为空", func(t *testing.T) {
+		extID := "1.2.3.4"
+		cert := x509.Certificate{
+			Extensions: []pkix.Extension{},
+		}
+		_, err := GetExtensionValue(extID, cert)
+		if err != errCertExtensionNotFound {
+			t.Fatalf("expected error %v, got %v", errCertExtensionNotFound, err)
+		}
+	})
+
+	// 边界情况：扩展值正好为2字节
+	t.Run("扩展值正好为2字节", func(t *testing.T) {
+		extID := "1.2.3.4"
+		extValue := []byte{0x30, 0x02}
+		cert := x509.Certificate{
+			Extensions: []pkix.Extension{
+				{Id: asn1.ObjectIdentifier{1, 2, 3, 4}, Value: extValue},
+			},
+		}
+		expected := []byte{}
+		result, err := GetExtensionValue(extID, cert)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !isEqual(result, expected) {
+			t.Fatalf("expected %v, got %v", expected, result)
+		}
+	})
+}
+
+func isEqual(a, b []byte) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
 }

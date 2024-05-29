@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	errCertExtensionNotFound = errors.New("cert extension not found")
+	errCertExtensionNotFound       = errors.New("cert extension not found")
+	errCertExtensionNotASN1Encoded = errors.New("cert extension not asn.1 encoded")
 )
 
 func SM2Verify(raw, signature, pubKeyBytes []byte) bool {
@@ -36,7 +37,10 @@ func GetExtensionValue(id string, cert x509.Certificate) ([]byte, error) {
 		if id != extension.Id.String() {
 			continue
 		}
-		return extension.Value, nil
+		if len(extension.Value) < 2 {
+			return nil, errCertExtensionNotASN1Encoded
+		}
+		return extension.Value[2:], nil
 	}
 	return nil, errCertExtensionNotFound
 }
