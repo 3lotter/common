@@ -20,25 +20,28 @@ import (
 )
 
 const (
-	mysqlDBMS      string = "mysql"
-	postgresqlDBMS string = "pgsql"
-	dmsqlDBMS      string = "dmsql"
-	xugusqlDBMS    string = "xugusql"
+	mysqlDBMS       string = "mysql"
+	postgresqlDBMS  string = "pgsql"
+	dmsqlDBMS       string = "dmsql"
+	xugusqlDBMS     string = "xugusql"
+	xuguclusterDBMS string = "xugucluster"
 )
 
 // 各数据库连接语句默认模板
 const (
-	mysqlDsnFormat      string = "%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local%s"
-	postgresqlDsnFormat string = "postgres://%s:%s@%s:%d/%s?sslmode=disable%s"
-	dmsqlDsnFormat      string = "dm://%s:%s@%s:%d?schema=%s%s"
-	xugusqlDsnFormat    string = "User=%s;PWD=%s;IP=%s;Port=%d;DB=%s;CURRENT_SCHEMA=%s;AUTO_COMMIT=on;CHAR_SET=UTF8%s"
+	mysqlDsnFormat       string = "%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local%s"
+	postgresqlDsnFormat  string = "postgres://%s:%s@%s:%d/%s?sslmode=disable%s"
+	dmsqlDsnFormat       string = "dm://%s:%s@%s:%d?schema=%s%s"
+	xugusqlDsnFormat     string = "User=%s;PWD=%s;IP=%s;Port=%d;DB=%s;CURRENT_SCHEMA=%s%s"
+	xuguclusterDsnFormat string = "User=%s;PWD=%s;IPS=%s;Port=%d;DB=%s;CURRENT_SCHEMA=%s%s"
 )
 
 var DsnMap = map[string]string{
-	mysqlDBMS:      mysqlDsnFormat,
-	postgresqlDBMS: postgresqlDsnFormat,
-	dmsqlDBMS:      dmsqlDsnFormat,
-	xugusqlDBMS:    xugusqlDsnFormat,
+	mysqlDBMS:       mysqlDsnFormat,
+	postgresqlDBMS:  postgresqlDsnFormat,
+	dmsqlDBMS:       dmsqlDsnFormat,
+	xugusqlDBMS:     xugusqlDsnFormat,
+	xuguclusterDBMS: xuguclusterDsnFormat,
 }
 
 type Conf struct {
@@ -66,7 +69,7 @@ func (conf Conf) GenerateDSN() (string, error) {
 		return fmt.Sprintf(dsnFormat, conf.Username, conf.Password, conf.IP, conf.Port, conf.DBName, conf.External), nil
 	case postgresqlDBMS, dmsqlDBMS:
 		return fmt.Sprintf(dsnFormat, conf.Username, conf.Password, conf.IP, conf.Port, conf.Schema, conf.External), nil
-	case xugusqlDBMS:
+	case xugusqlDBMS, xuguclusterDBMS:
 		return fmt.Sprintf(dsnFormat, conf.Username, conf.Password, conf.IP, conf.Port, conf.DBName, conf.Schema, conf.External), nil
 	}
 	return "", fmt.Errorf("DBMS [%s] not supported", conf.DBMS)
@@ -106,7 +109,7 @@ func SetupDB(conf Conf) (*MyGormDB, error) {
 		gormDB, err = gorm.Open(postgres.Open(conf.DSN), gormConf)
 	case dmsqlDBMS:
 		gormDB, err = gorm.Open(dm.Open(conf.DSN), gormConf)
-	case xugusqlDBMS:
+	case xugusqlDBMS, xuguclusterDBMS:
 		gormDB, err = gorm.Open(xugu.Open(conf.DSN), gormConf)
 	default:
 		return nil, errors.New(fmt.Sprintf("DBMS [%s] not supported", dbms))
@@ -123,6 +126,7 @@ func SetupDB(conf Conf) (*MyGormDB, error) {
 	}
 	err = sqlDb.Ping()
 	if err != nil {
+		sqlDb.Close()
 		return nil, errors.Wrap(err, "sqlDb.Ping fail")
 	}
 
