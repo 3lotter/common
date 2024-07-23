@@ -2,8 +2,16 @@ package utils
 
 import (
 	"encoding/base64"
-	"errors"
+	"github.com/pkg/errors"
+	"github.com/tjfoc/gmsm/sm2"
 	"github.com/tjfoc/gmsm/x509"
+)
+
+type DecryptMode int
+
+const (
+	C1C3C2 DecryptMode = iota
+	C1C2C3
 )
 
 var (
@@ -17,6 +25,35 @@ func SM2Verify(raw, signature, pubKeyBytes []byte) bool {
 		return false
 	}
 	return publicKey.Verify(raw, signature)
+}
+
+func SM2Decrypt(keyBase64, cipherTextBase64 string, mode DecryptMode) ([]byte, error) {
+	// 实例化私钥
+	keyBytes, err := base64.StdEncoding.DecodeString(keyBase64)
+	if err != nil {
+		return nil, errors.Wrap(err, "base64.StdEncoding.DecodeString fail")
+	}
+
+	var sm2Key *sm2.PrivateKey
+	sm2Key, err = x509.ParsePKCS8UnecryptedPrivateKey(keyBytes)
+	if err != nil {
+		return nil, errors.Wrap(err, "x509.ParseSm2PrivateKey fail")
+	}
+
+	// 密文解密
+	var cipherText []byte
+	cipherText, err = base64.StdEncoding.DecodeString(cipherTextBase64)
+	if err != nil {
+		return nil, errors.Wrap(err, "base64.StdEncoding.DecodeString fail")
+	}
+
+	var plainText []byte
+	plainText, err = sm2.Decrypt(sm2Key, cipherText, int(mode))
+	if err != nil {
+		return nil, errors.Wrap(err, "sm2.Decrypt fail")
+	}
+
+	return plainText, nil
 }
 
 func ParseX509Certificate(certBase64 string) (*x509.Certificate, error) {
