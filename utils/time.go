@@ -14,16 +14,16 @@ const (
 
 // FormatTime 根据Time获取给定格式的本地格式化时间
 func FormatTime(t time.Time, dateFormat string) string {
-	return t.In(time.Local).Format(dateFormat)
+	return t.Format(dateFormat)
 }
 
 // FormatTimestamp 根据毫秒级时间戳获取按给定格式的本地格式化时间
 func FormatTimestamp(timestamp int64, dateFormat string) string {
 	t := time.UnixMilli(timestamp)
-	return t.In(time.Local).Format(dateFormat)
+	return t.Format(dateFormat)
 }
 
 // ParseFormattedTime 按给定格式解析本地格式化时间
 func ParseFormattedTime(datetime string, dateFormat string) (time.Time, error) {
-	return time.ParseInLocation(dateFormat, datetime, time.Local)
+	return time.Parse(dateFormat, datetime)
 }
