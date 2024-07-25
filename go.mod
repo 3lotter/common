@@ -16,6 +16,7 @@ require (
 	github.com/3lotter/dm-gorm2-dialect v1.0.0
 	github.com/3lotter/xugu-gorm2-dialect v1.0.1
 	github.com/DATA-DOG/go-sqlmock v1.5.2
+	github.com/bsm/redislock v0.9.4
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
