@@ -56,3 +56,17 @@ func SetupRedis(conf Conf) (*MyRedis, error) {
 
 	return &MyRedis{redisClient}, nil
 }
+
+func (mr *MyRedis) SetString(key string, data string, expire int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	return mr.Set(ctx, key, data, time.Duration(expire)*time.Second).Err()
+}
+
+func (mr *MyRedis) GetString(key string) (string, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	return mr.Get(ctx, key).Result()
+}
